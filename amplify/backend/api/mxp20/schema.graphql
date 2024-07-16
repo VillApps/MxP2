@@ -1,0 +1,53 @@
+type ViAUserEx @model @auth(rules: [{ allow: groups, groups: ["superAdmin"] }, { allow: private, operations: [read] }, { allow: owner }]) {
+  id: ID!
+  owner: String
+  ViAGroup: [ViAGroup] @manyToMany(relationName: "ViAUserExViAGroup")
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+type ViAGroup @model @auth(rules: [{ allow: groups, groups: ["superAdmin"] }, { allow: private, operations: [read] }]) {
+  id: ID!
+  owner: String
+  name: String
+  ViAUserEx: [ViAUserEx] @manyToMany(relationName: "ViAUserExViAGroup")
+  ViAView: [ViAView] @manyToMany(relationName: "ViAGroupViAView")
+  ViAMenu: [ViAMenu] @manyToMany(relationName: "ViAGroupViAMenu")
+  ViAMenuItem: [ViAMenuItem] @manyToMany(relationName: "ViAGroupViAMenuItem")
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+type ViAView @model @auth(rules: [{ allow: groups, groups: ["superAdmin"] }, { allow: private, operations: [read] }]) {
+  id: ID!
+  owner: String
+  name: String
+  ViAGroup: [ViAGroup] @manyToMany(relationName: "ViAGroupViAView")
+  ViAMenu: [ViAMenu] @manyToMany(relationName: "ViAViewViAMenu")
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+type ViAMenu @model @auth(rules: [{ allow: groups, groups: ["superAdmin"] }, { allow: private, operations: [read] }]) {
+  id: ID!
+  owner: String
+  name: String
+  ViAGroup: [ViAGroup] @manyToMany(relationName: "ViAGroupViAMenu")
+  ViAView: [ViAView] @manyToMany(relationName: "ViAViewViAMenu")
+  ViAMenuItem: [ViAMenuItem] @manyToMany(relationName: "ViAMenuViAMenuItem")
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+type ViAMenuItem @model @auth(rules: [{ allow: groups, groups: ["superAdmin"] }, { allow: private, operations: [read] }]) {
+  id: ID!
+  owner: String
+  name: String
+  url: String
+  orden: Int
+  ViAGroup: [ViAGroup] @manyToMany(relationName: "ViAGroupViAMenuItem")
+  ViAMenu: [ViAMenu] @manyToMany(relationName: "ViAMenuViAMenuItem")
+  component: String
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}

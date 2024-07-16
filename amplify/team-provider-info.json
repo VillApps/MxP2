@@ -1,0 +1,30 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-mxp20-dev-065cb-authRole",
+      "UnauthRoleArn": "arn:aws:iam::455766485825:role/amplify-mxp20-dev-065cb-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::455766485825:role/amplify-mxp20-dev-065cb-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-mxp20-dev-065cb-deployment",
+      "UnauthRoleName": "amplify-mxp20-dev-065cb-unauthRole",
+      "StackName": "amplify-mxp20-dev-065cb",
+      "StackId": "arn:aws:cloudformation:us-east-1:455766485825:stack/amplify-mxp20-dev-065cb/070dc020-37d8-11ef-b64e-12738c3ff619",
+      "AmplifyAppId": "duigjbyjaudi5"
+    },
+    "categories": {
+      "auth": {
+        "mxp2024b2e886": {}
+      },
+      "function": {
+        "AdminQueries5a0b9ac4": {
+          "deploymentBucketName": "amplify-mxp20-dev-065cb-deployment",
+          "s3Key": "amplify-builds/AdminQueries5a0b9ac4-3834457534794331484e-build.zip"
+        }
+      },
+      "api": {
+        "AdminQueries": {},
+        "mxp20": {}
+      }
+    }
+  }
+}

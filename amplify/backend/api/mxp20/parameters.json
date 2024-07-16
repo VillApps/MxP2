@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "mxp20",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authmxp2024b2e886",
+      "Outputs.UserPoolId"
+    ]
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "api": {
+    "AdminQueries": {
+      "authorizationType": "AMAZON_COGNITO_USER_POOLS",
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "mxp2024b2e886"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "AdminQueries5a0b9ac4"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
+    "mxp20": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "mxp2024b2e886"
+        }
+      ],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [],
+          "defaultAuthentication": {
+            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "userPoolConfig": {
+              "userPoolId": "authmxp2024b2e886"
+            }
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  },
+  "auth": {
+    "mxp2024b2e886": {
+      "customAuth": false,
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito"
+    }
+  },
+  "function": {
+    "AdminQueries5a0b9ac4": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "mxp2024b2e886"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_AdminQueries5a0b9ac4_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "AdminQueries5a0b9ac4"
+        }
+      ]
+    },
+    "AMPLIFY_function_AdminQueries5a0b9ac4_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "AdminQueries5a0b9ac4"
+        }
+      ]
+    }
+  }
+}
