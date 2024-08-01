@@ -15,8 +15,12 @@ function Screen({ view }: any) {
         </Backdrop>
       )}
       <NavBar />
-      {isUtilsBar.show && <UtilsBar />}
-      <br />
+      {isUtilsBar.show && (
+        <>
+          <UtilsBar />
+          <br />
+        </>
+      )}
       {view}
     </Box>
   );

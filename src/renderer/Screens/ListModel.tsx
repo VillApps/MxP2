@@ -88,10 +88,11 @@ function ListModel() {
         const queryName = `delete${model}`;
         for (let i = 0; i < rowSelectionModel.length; i++) {
           const itemId = rowSelectionModel[i];
-          await client.graphql({
+          const res = await client.graphql({
             query: mutations[queryName],
             variables: { input: { id: itemId } },
           });
+          aS.log('ListModel - deleteItem - res', res);
         }
       } catch (error) {
         aS.log('ListModel - deleteItem - error', error);

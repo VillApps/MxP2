@@ -11,6 +11,11 @@ import router from './Utils/Routes';
 import { Box, colors, Typography } from '@mui/material';
 import AuthInit from './Components/AuthInit';
 import { useSelector } from 'react-redux';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/es-mx';
+import aS from './Utils/AppService';
+import { useEffect } from 'react';
 
 export function App() {
   const ViAUserEx = useSelector((state: any) => state.Ui.ViAUserEx);
@@ -31,6 +36,20 @@ export function App() {
     },
   };
 
-  return <Authenticator components={components}>{ViAUserEx.id ? <RouterProvider router={router} /> : <AuthInit />}</Authenticator>;
+  // useEffect(() => {
+  //   aS.log('App - useEffect - ViAUserEx', ViAUserEx);
+  // }, [ViAUserEx]);
+
+  return (
+    <Authenticator components={components}>
+      {ViAUserEx.id ? (
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es-mx">
+          <RouterProvider router={router} />
+        </LocalizationProvider>
+      ) : (
+        <AuthInit />
+      )}
+    </Authenticator>
+  );
 }
 export default App;

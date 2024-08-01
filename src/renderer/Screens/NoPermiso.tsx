@@ -2,16 +2,17 @@ import { Box, Button, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate, useRouteError } from 'react-router-dom';
 import { signOut } from 'aws-amplify/auth';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import aS from '../Utils/AppService';
 import { AppDispatch } from '../States/Store';
 import { setViAUserEx } from '../States/UiSlice';
 
 function NoPermiso() {
+  const ViAUserEx = useSelector((state: any) => state.Ui.ViAUserEx);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const error = useRouteError();
-  aS.log('NoPermiso - error', error);
+  // aS.log('NoPermiso - error', error);
 
   return (
     <Box
@@ -31,12 +32,7 @@ function NoPermiso() {
         contacta a tu administrador.
       </Typography>
       <br />
-      <Button
-        variant="contained"
-        onClick={() => {
-          navigate('/');
-        }}
-      >
+      <Button variant="contained" onClick={() => {}}>
         Regresa al inicio
       </Button>
       <br />

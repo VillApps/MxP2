@@ -5,95 +5,99 @@ import { blueGrey, grey, teal } from '@mui/material/colors';
 import { Theme, ThemeProvider as AmpThemeProvider } from '@aws-amplify/ui-react';
 import { Amplify } from 'aws-amplify';
 import { Provider } from 'react-redux';
+import { esES } from '@mui/material/locale';
 import { App } from './App';
 import config from '../aws-exports';
 import { store } from './States/Store';
 
 Amplify.configure(config);
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: grey[800],
+const theme = createTheme(
+  {
+    palette: {
+      primary: {
+        main: grey[800],
+      },
+      secondary: {
+        main: grey[50],
+      },
+      info: {
+        main: blueGrey[300],
+      },
+      success: {
+        main: teal[800],
+      },
     },
-    secondary: {
-      main: grey[50],
-    },
-    info: {
-      main: blueGrey[300],
-    },
-    success: {
-      main: teal[800],
+    components: {
+      MuiButton: {
+        defaultProps: {
+          size: 'small',
+        },
+      },
+      MuiFilledInput: {
+        defaultProps: {
+          margin: 'dense',
+        },
+      },
+      MuiFormControl: {
+        defaultProps: {
+          margin: 'dense',
+        },
+      },
+      MuiFormHelperText: {
+        defaultProps: {
+          margin: 'dense',
+        },
+      },
+      MuiIconButton: {
+        defaultProps: {
+          size: 'small',
+        },
+      },
+      MuiInputBase: {
+        defaultProps: {
+          margin: 'dense',
+        },
+      },
+      MuiInputLabel: {
+        defaultProps: {
+          margin: 'dense',
+        },
+      },
+      MuiListItem: {
+        defaultProps: {
+          dense: true,
+        },
+      },
+      MuiOutlinedInput: {
+        defaultProps: {
+          margin: 'dense',
+        },
+      },
+      MuiFab: {
+        defaultProps: {
+          size: 'small',
+        },
+      },
+      MuiTable: {
+        defaultProps: {
+          size: 'small',
+        },
+      },
+      MuiTextField: {
+        defaultProps: {
+          margin: 'dense',
+        },
+      },
+      MuiToolbar: {
+        defaultProps: {
+          variant: 'dense',
+        },
+      },
     },
   },
-  components: {
-    MuiButton: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiFilledInput: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiFormControl: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiFormHelperText: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiIconButton: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiInputBase: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiInputLabel: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiListItem: {
-      defaultProps: {
-        dense: true,
-      },
-    },
-    MuiOutlinedInput: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiFab: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiTable: {
-      defaultProps: {
-        size: 'small',
-      },
-    },
-    MuiTextField: {
-      defaultProps: {
-        margin: 'dense',
-      },
-    },
-    MuiToolbar: {
-      defaultProps: {
-        variant: 'dense',
-      },
-    },
-  },
-});
+  esES,
+);
 
 const Amptheme: Theme = {
   name: 'VillApps theme',

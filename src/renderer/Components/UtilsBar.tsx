@@ -24,7 +24,7 @@ function UtilsBar() {
         <BreadcrumbsNav />
       </Grid>
       {isUtilsBar && (
-        <Grid container justifyContent="space-between">
+        <Grid container justifyContent="flex-start">
           {isUtilsBar.btns &&
             isUtilsBar.btnsFns.map((btn: any, btnIndex: number) => (
               <Grid key={`btnIndex${btnIndex}`}>
@@ -33,7 +33,7 @@ function UtilsBar() {
                   sx={{ margin: '10px' }}
                   variant="contained"
                   onClick={() => {
-                    btn.fn();
+                    btn.fn(btn.fnVars);
                   }}
                 >
                   {btn.name}

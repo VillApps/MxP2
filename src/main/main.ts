@@ -15,6 +15,7 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import AppsVilleBD from './Process/AppsVilleBD';
+import processPrice from './Process/ProcessPrice';
 
 class AppUpdater {
   constructor() {
@@ -63,7 +64,7 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1280,
+    width: 1600,
     height: 1200,
     x: 2880 - 1024,
     y: 0,
@@ -72,6 +73,8 @@ const createWindow = async () => {
       preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
+
+  // mainWindow.maximize();
 
   AppsVilleBD();
 
@@ -84,7 +87,7 @@ const createWindow = async () => {
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
-      // mainWindow.show();
+      mainWindow.show();
     }
   });
 
@@ -104,6 +107,12 @@ const createWindow = async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
+
+  try {
+    await processPrice();
+  } catch (error) {
+    console.log('Error executing processPrice:', error);
+  }
 };
 
 /**

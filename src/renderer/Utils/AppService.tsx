@@ -10,7 +10,7 @@ const client = generateClient();
 interface ASInterface {
   log: (text: string, obj: any) => void;
   parseJsonProperties: (obj: any) => any;
-  formatAsCurrency: (value: any) => any;
+  fAC: (value: any) => any;
   upsertModel: (dispatch: any, operation: any, obj: any) => any;
   breadCrumbsGoTo: (dispatch: any, navigate: any, breadCrumbs: any, link: string) => any;
   version: string;
@@ -59,7 +59,7 @@ const aS: ASInterface = {
     }
     return obj;
   },
-  formatAsCurrency: (value: any) => {
+  fAC: (value: any) => {
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
       currency: 'MXN',

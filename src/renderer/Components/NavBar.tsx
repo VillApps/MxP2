@@ -45,7 +45,7 @@ function NavBar() {
   useEffect(() => {}, []);
 
   return (
-    <AppBar position="static">
+    <AppBar position="fixed">
       <Toolbar>
         <Grid container justifyContent="space-between" alignItems="center" sx={{ width: '100%' }}>
           <Grid>

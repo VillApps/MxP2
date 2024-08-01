@@ -12,7 +12,6 @@ function AuthInit() {
     try {
       dispatch(setLoading(true));
       await dispatch(initViAUserEx());
-      aS.log('AuthInit - init - start', 'start');
     } catch (error) {
       aS.log('AuthInit - init - error', error);
     } finally {

@@ -167,7 +167,17 @@ function UpsertModel() {
 
   useEffect(() => {
     if (schema && queries && mutations) {
-      dispatch(setIsUtilsBar({ show: true, model, btns: true, btnsFns: [{ name: 'Nuevo', fn: newItem }] }));
+      dispatch(
+        setIsUtilsBar({
+          show: true,
+          model,
+          btns: true,
+          btnsFns: [
+            { name: 'Nuevo', fn: newItem },
+            { name: 'Editar', fn: saveDB },
+          ],
+        }),
+      );
       if (itemId !== 'new') {
         fetchItem();
       } else {

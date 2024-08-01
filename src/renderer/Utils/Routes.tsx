@@ -5,6 +5,7 @@ import NoPermiso from '../Screens/NoPermiso';
 import UpsertModel from '../Screens/UpsertModel';
 import ProtectedLogic from '../Components/ProtectedLogic';
 import EstadoResultados from '../Screens/EstadoResultados';
+import CostosProductos from '../Screens/CostosProductos';
 
 const router = createHashRouter([
   {
@@ -14,7 +15,15 @@ const router = createHashRouter([
         <Home />
       </ProtectedLogic>
     ),
-    errorElement: <NoPermiso />,
+    index: true,
+  },
+  {
+    path: '/Home',
+    element: (
+      <ProtectedLogic viewAccess="Home">
+        <Home />
+      </ProtectedLogic>
+    ),
     index: true,
   },
   {
@@ -36,8 +45,16 @@ const router = createHashRouter([
   {
     path: '/EstadoResultados',
     element: (
-      <ProtectedLogic viewAccess="EstadoResultados">
+      <ProtectedLogic viewAccess="Estado de resultados">
         <EstadoResultados />
+      </ProtectedLogic>
+    ),
+  },
+  {
+    path: '/CostosProductos',
+    element: (
+      <ProtectedLogic viewAccess="Productos">
+        <CostosProductos />
       </ProtectedLogic>
     ),
   },

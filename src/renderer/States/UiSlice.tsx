@@ -120,8 +120,8 @@ export const initViAUserEx = createAsyncThunk('UserExt/initViAUserEx', async () 
         }
       }
     }
-    console.log('UserExtSlice - initViAUserEx - userExt');
-    console.log(userExt);
+    // console.log('UserExtSlice - initViAUserEx - userExt');
+    // console.log(userExt);
     return parseJsonProperties(userExt);
   } catch (error) {
     console.log('UserExtSlice - initViAUserEx - Error');
