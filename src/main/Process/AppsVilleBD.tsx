@@ -635,7 +635,7 @@ export default function AppsVilleBD() {
     }
   });
 
-  ipcMain.on('getProducts', async (event, channel) => {
+  ipcMain.on('getProducts', async (event, channel, { filters = {}, sort = {}, pagination = { page: 0, rowsPerPage: 50 } }) => {
     const client = await pool.connect();
     try {
       initIpc('getProducts');
@@ -643,31 +643,84 @@ export default function AppsVilleBD() {
       await mdb.connect();
       const db = mdb.db(mdbName);
       const collection = db.collection('Productos');
-      const { rows: products } = await client.query(`
-            SELECT
-                pp.id,
-                pp.default_code,
-                pp.barcode,
-                pt.name->>'es_MX' AS name
-            FROM
-                product_product pp
-            JOIN
-                product_template pt ON pt.id = pp.product_tmpl_id
-            WHERE
-                pp.active
-        `);
+
+      // Validate pagination inputs
+      const { page, rowsPerPage } = pagination;
+      if (typeof page !== 'number' || typeof rowsPerPage !== 'number') {
+        throw new TypeError('Invalid pagination parameters');
+      }
+
+      // Prepare filter conditions for PostgreSQL
+      const pgFilterConditions = [];
+      const filterValues = [];
+
+      if (filters.name) {
+        pgFilterConditions.push("pt.name->>'es_MX' ILIKE $1");
+        filterValues.push(`%${filters.name}%`);
+      }
+      if (filters.default_code) {
+        pgFilterConditions.push('pp.default_code ILIKE $2');
+        filterValues.push(`%${filters.default_code}%`);
+      }
+      if (filters.barcode) {
+        pgFilterConditions.push('pp.barcode ILIKE $3');
+        filterValues.push(`%${filters.barcode}%`);
+      }
+
+      const pgFilterQuery = pgFilterConditions.length ? `AND ${pgFilterConditions.join(' AND ')}` : '';
+
+      // Prepare sorting
+      const pgSortQuery = sort.key ? `ORDER BY ${sort.key} ${sort.order.toUpperCase()}` : '';
+
+      // Calculate pagination
+      const offset = page * rowsPerPage;
+      const pgPaginationQuery = `LIMIT ${rowsPerPage} OFFSET ${offset}`;
+
+      const query = `
+        SELECT
+          pp.id,
+          pp.default_code,
+          pp.barcode,
+          pt.name->>'es_MX' AS name
+        FROM
+          product_product pp
+        JOIN
+          product_template pt ON pt.id = pp.product_tmpl_id
+        WHERE
+          pp.active
+        ${pgFilterQuery}
+        ${pgSortQuery}
+        ${pgPaginationQuery}
+      `;
+
+      const { rows: products } = await client.query(query, filterValues);
       const productIds = products.map((product) => product.id);
-      const productsMongo = await collection.find({ product_id: { $in: productIds } }).toArray();
-      const productsMongoMap = productsMongo.reduce((map: any, productMongo) => {
+
+      // Prepare filter conditions for MongoDB
+      const mongoFilters = { product_id: { $in: productIds } };
+      if (filters.hasNegativeProfit !== undefined) {
+        mongoFilters.hasNegativeProfit = filters.hasNegativeProfit;
+      }
+      if (filters.lowestProfit !== undefined) {
+        mongoFilters.lowestProfit = { $gte: filters.lowestProfit };
+      }
+
+      // Fetch from MongoDB
+      const productsMongo = await collection.find(mongoFilters).toArray();
+      const productsMongoMap = productsMongo.reduce((map, productMongo) => {
         map[productMongo.product_id] = productMongo;
         return map;
       }, {});
+
+      // Merge PostgreSQL and MongoDB data
       const mergedProducts = products.map((product) => ({
         ...product,
         ...productsMongoMap[product.id],
       }));
+
       await resEvent('getProducts', channel, event, mergedProducts);
     } catch (error) {
+      console.error('getProducts -- Error', error);
       displayError('getProducts', error);
     } finally {
       client.release();

@@ -4,8 +4,8 @@
 import { Pool, PoolClient } from 'pg';
 import { MongoClient, Collection } from 'mongodb';
 
-const BATCH_SIZE = 500; // Increase batch size to reduce overhead
-const CONCURRENT_LIMIT = 5; // Limit the number of concurrent batches
+const BATCH_SIZE = 500;
+const CONCURRENT_LIMIT = 5;
 
 function logL(text: string, obj: any) {
   console.log('-------------------------------------------');

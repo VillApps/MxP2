@@ -1,8 +1,6 @@
-/* eslint-disable no-alert */
-/* eslint-disable no-prototype-builtins */
-/* eslint-disable no-plusplus */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-alert */
 import React, { useEffect, useState, useMemo, useCallback, ChangeEvent, KeyboardEvent } from 'react';
 import { useDispatch } from 'react-redux';
 import {
@@ -29,7 +27,7 @@ import {
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import Papa from 'papaparse';
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'; // Ensure this import
 import { AppDispatch } from '../States/Store';
 import { setIsUtilsBar, setLoading } from '../States/UiSlice';
 import ipc from '../Utils/Ipc';
@@ -45,14 +43,12 @@ const CostosProductos = React.memo(() => {
   const dispatch = useDispatch<AppDispatch>();
   const [overAllWidth, setOverAllWidth] = useState(false);
   const [productos, setProductos] = useState<Product[]>([]);
-  const [orderBy, setOrderBy] = useState<Record<string, 'asc' | 'desc'>>({ profitAT: 'desc' });
+  const [orderBy, setOrderBy] = useState<{ key: string; order: 'asc' | 'desc' } | null>({ key: 'profitAT', order: 'desc' });
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [rowsPerPage, setRowsPerPage] = useState<number>(50);
   const [page, setPage] = useState<number>(0);
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const gastos = 3796877.73;
 
   const headCells: any = useMemo(
     () => [
@@ -74,18 +70,13 @@ const CostosProductos = React.memo(() => {
 
   const handleOrderClick = useCallback((headCell: any) => {
     setOrderBy((prevOrderBy) => {
-      let newOrderBy = { ...prevOrderBy };
-      if (!newOrderBy.hasOwnProperty(headCell.id)) {
-        newOrderBy = {};
+      if (!prevOrderBy || prevOrderBy.key !== headCell.id) {
+        return { key: headCell.id, order: 'asc' };
       }
-      if (!newOrderBy[headCell.id]) {
-        newOrderBy[headCell.id] = 'asc';
-      } else if (newOrderBy[headCell.id] === 'asc') {
-        newOrderBy[headCell.id] = 'desc';
-      } else {
-        delete newOrderBy[headCell.id];
-      }
-      return newOrderBy;
+      return {
+        key: headCell.id,
+        order: prevOrderBy.order === 'asc' ? 'desc' : 'asc',
+      };
     });
   }, []);
 
@@ -104,39 +95,6 @@ const CostosProductos = React.memo(() => {
     [inputValues],
   );
 
-  const filteredProductos = useMemo(() => {
-    return productos.filter((product: any) => {
-      return Object.keys(filters).every((key) => {
-        if (!filters[key]) return true;
-        let value = product[key];
-        if (key === 'name') {
-          value = `${product.name} ${product.default_code} ${product.barcode}`;
-        }
-        if (key === 'lowestProfitOperation') {
-          value = `${product.lowestProfitOperation?.oper} ${product.lowestProfitOperation?.data}`;
-        }
-        return String(value).toLowerCase().includes(filters[key].toLowerCase());
-      });
-    });
-  }, [productos, filters]);
-
-  const sortedProductos = useMemo(() => {
-    const orderKey = Object.keys(orderBy)[0];
-    const order = orderBy[orderKey];
-
-    if (!orderKey || !order) return filteredProductos;
-
-    return filteredProductos.slice().sort((a: any, b: any) => {
-      const valueA = a[orderKey];
-      const valueB = b[orderKey];
-      const isNumeric = !Number.isNaN(Number(valueA || 0)) && !Number.isNaN(Number(valueB || 0));
-      if (isNumeric) {
-        return order === 'asc' ? Number(valueA || 0) - Number(valueB || 0) : Number(valueB || 0) - Number(valueA || 0);
-      }
-      return order === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
-    });
-  }, [filteredProductos, orderBy]);
-
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -147,15 +105,9 @@ const CostosProductos = React.memo(() => {
     setPage(0);
   };
 
-  const paginatedProductos = useMemo(() => {
-    const startIndex = page * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return sortedProductos.slice(startIndex, endIndex);
-  }, [sortedProductos, page, rowsPerPage]);
-
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = new Set<number>(paginatedProductos.map((product) => product.id));
+      const newSelecteds = new Set<number>(productos.map((product) => product.id));
       setSelected(newSelecteds);
     } else {
       setSelected(new Set());
@@ -175,7 +127,7 @@ const CostosProductos = React.memo(() => {
   };
 
   const exportToCSV = () => {
-    const filteredProducts = sortedProductos.filter((product) => selected.has(product.id));
+    const filteredProducts = productos.filter((product) => selected.has(product.id));
 
     if (filteredProducts.length === 0) {
       alert('No products selected for export.');
@@ -196,41 +148,26 @@ const CostosProductos = React.memo(() => {
     document.body.removeChild(link);
   };
 
-  const getProducts = async () => {
+  const getProducts = useCallback(async () => {
     try {
       dispatch(setLoading(true));
-      const res: Product[] = await ipc.q('getProducts');
+      const res: Product[] = await ipc.q('getProducts', {
+        filters,
+        sort: orderBy,
+        pagination: { page, rowsPerPage },
+      });
       setProductos(res);
     } catch (error) {
       aS.log('CostosProductos - getProducts - error', error);
     } finally {
       dispatch(setLoading(false));
     }
-  };
-
-  useEffect(() => {
-    if (page > Math.ceil(sortedProductos.length / rowsPerPage) - 1) {
-      setPage(0);
-    }
-  }, [sortedProductos.length, rowsPerPage, page]);
+  }, [filters, orderBy, page, rowsPerPage]);
 
   useEffect(() => {
     dispatch(setIsUtilsBar({ show: false }));
     getProducts();
-  }, []);
-
-  // useEffect(() => {
-  //   if (selected.size) {
-  //     selected.forEach((productId) => {
-  //       for (let i = 0; i < paginatedProductos.length; i++) {
-  //         const paginatedProducto = paginatedProductos[i];
-  //         if (paginatedProducto.id === productId) {
-  //           aS.log('CostosProductos - useEffect - paginatedProducto', paginatedProducto);
-  //         }
-  //       }
-  //     });
-  //   }
-  // }, [selected]);
+  }, [getProducts, dispatch]);
 
   return (
     <Paper sx={{ width: '100%vw', overflow: 'hidden' }}>
@@ -250,7 +187,7 @@ const CostosProductos = React.memo(() => {
                 <TablePagination
                   rowsPerPageOptions={[50, 100, 500, 1000]}
                   component="div"
-                  count={sortedProductos.length}
+                  count={productos.length} // Adjust this to reflect the total count from the backend
                   rowsPerPage={rowsPerPage}
                   page={page}
                   onPageChange={handleChangePage}
@@ -264,23 +201,19 @@ const CostosProductos = React.memo(() => {
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox">
-                <Checkbox
-                  indeterminate={selected.size > 0 && selected.size < paginatedProductos.length}
-                  checked={selected.size === paginatedProductos.length}
-                  onChange={handleSelectAllClick}
-                />
+                <Checkbox indeterminate={selected.size > 0 && selected.size < productos.length} checked={selected.size === productos.length} onChange={handleSelectAllClick} />
               </TableCell>
               {headCells.map((headCell: any) => (
                 <TableCell key={headCell.id} align={headCell.numeric ? 'right' : 'left'}>
                   <Stack>
                     <Box>
-                      <TableSortLabel active={!!orderBy[headCell.id]} direction={orderBy[headCell.id]} onClick={() => handleOrderClick(headCell)}>
+                      <TableSortLabel active={orderBy ? orderBy.key === headCell.id : false} direction={orderBy ? orderBy.order : 'asc'} onClick={() => handleOrderClick(headCell)}>
                         <Typography noWrap variant="caption" sx={{ fontWeight: 'bold' }}>
                           {headCell.label}
                         </Typography>
-                        {orderBy[headCell.id] && (
+                        {orderBy && orderBy.key === headCell.id && (
                           <Box component="span" sx={visuallyHidden}>
-                            {orderBy[headCell.id] === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                            {orderBy.order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                           </Box>
                         )}
                       </TableSortLabel>
@@ -300,8 +233,8 @@ const CostosProductos = React.memo(() => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedProductos.length > 0 ? (
-              paginatedProductos.map((product: any, productIndex: number) => (
+            {productos.length > 0 ? (
+              productos.map((product: any, productIndex: number) => (
                 <React.Fragment key={`productIndex${product.id}${productIndex}`}>
                   <TableRow hover>
                     <TableCell padding="checkbox">
